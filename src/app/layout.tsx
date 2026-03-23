@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Noto_Serif } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import { getSession } from "@/lib/session";
+import { logout } from "@/lib/auth-actions";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const serif = Noto_Serif({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-serif" });
@@ -11,11 +13,13 @@ export const metadata: Metadata = {
   description: "Zarządzanie infrastrukturą akademicką",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getSession();
+
   return (
     <html lang="pl">
       <body className={`${inter.variable} ${serif.variable} bg-background text-foreground min-h-screen flex flex-col font-sans selection:bg-primary/30`}>
@@ -28,14 +32,25 @@ export default function RootLayout({
             </span>
           </div>
           <div className="flex gap-6 items-center">
-            <Link href="#" className="hover:text-primary transition-colors">Centrum Pomocy</Link>
-            <Link href="#" className="hover:text-primary transition-colors">Dokumentacja</Link>
-            <div className="border-l border-white/10 pl-6 flex items-center gap-3">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-primary/20">
-                AK
-              </div>
-              <span className="hidden sm:inline">Zalogowano: <span className="text-slate-100 font-semibold italic">Administrator Systemu</span></span>
-            </div>
+            {session ? (
+              <>
+                <div className="border-l border-white/10 pl-6 flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-indigo-600 flex items-center justify-center text-[10px] font-bold text-white shadow-lg shadow-primary/20">
+                    {session.username.substring(0, 2).toUpperCase()}
+                  </div>
+                  <span className="hidden sm:inline text-slate-300">
+                    Zalogowano: <span className="text-slate-100 font-semibold italic">{session.role} ({session.username})</span>
+                  </span>
+                </div>
+                <form action={logout}>
+                  <button className="text-red-400/70 hover:text-red-400 transition-colors bg-red-400/5 hover:bg-red-400/10 px-3 py-1 rounded-md border border-red-400/10">
+                    Wyloguj
+                  </button>
+                </form>
+              </>
+            ) : (
+              <Link href="/login" className="hover:text-primary transition-colors font-bold uppercase tracking-widest text-[10px]">Logowanie</Link>
+            )}
           </div>
         </div>
 
