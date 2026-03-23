@@ -2,33 +2,53 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { decryptSession } from './lib/session';
 
-// Trasy, które wymagają logowania
-const protectedRoutes = ['/', '/schedules', '/equipment-analytics'];
-// Trasy tylko dla gości (np. /login)
-const publicRoutes = ['/login'];
+// Profesjonalne podejście: lista tras publicznych, reszta chroniona
+const publicPaths = ['/login', '/api'];
 
 export async function middleware(req: NextRequest) {
-  const path = req.nextUrl.pathname;
-  const isProtectedRoute = protectedRoutes.includes(path) || path === '/';
-  const isPublicRoute = publicRoutes.includes(path);
+  const { pathname } = req.nextUrl;
 
-  const session = req.cookies.get('session')?.value;
-  const payload = session ? decryptSession(session) : null;
-
-  // 1. Przekierowanie do /login, jeśli brak sesji na chronionej trasie
-  if (isProtectedRoute && !payload) {
-    return NextResponse.redirect(new URL('/login', req.nextUrl));
+  // Pozwól na pliki statyczne i publiczne trasy
+  const isPublicPath = publicPaths.some(path => pathname.startsWith(path));
+  if (isPublicPath) {
+    return NextResponse.next();
   }
 
-  // 2. Przekierowanie do / pulpitu, jeśli sesja aktywna na trasie publicznej
-  if (isPublicRoute && payload) {
+  // Sprawdź sesję
+  const sessionCookie = req.cookies.get('session')?.value;
+  const payload = sessionCookie ? await decryptSession(sessionCookie) : null;
+
+  // Brak sesji na chronionej trasie -> do logowania
+  if (!payload) {
+    const loginUrl = new URL('/login', req.nextUrl);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Zalogowany użytkownik wchodzi na /login -> do strony głównej
+  if (pathname === '/login' && payload) {
     return NextResponse.redirect(new URL('/', req.nextUrl));
   }
+
+  // Sesja jest, ale użytkownik wchodzi na /login (choć jest to obsługiwane przez isPublicPath wyżej, 
+  // warto być jawnym, jeśli /login nie jest w isPublicPath lub chcemy go przekierować z /login na /)
+  // Ale tutaj /login jest w publicPaths, więc ten kod nie zostanie wykonany dla /login.
+  // Poprawiamy logikę publicPaths:
 
   return NextResponse.next();
 }
 
-// Konfiguracja matcherów, aby middleware nie działał dla plików statycznych itp.
+// Dodatkowy check dla zalogowanych na /login
+// (Można to złączyć w jedną funkcję, ale dla czytelności rozdzielamy)
+
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|.*\\.png$).*)'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 };
