@@ -13,6 +13,7 @@ async function runSQL() {
 
   try {
     console.log("Usuwanie starych tabel (jeśli istnieją)...");
+    await sql`DROP TABLE IF EXISTS users CASCADE;`;
     await sql`DROP TABLE IF EXISTS schedules CASCADE;`;
     await sql`DROP TABLE IF EXISTS courses CASCADE;`;
     await sql`DROP TABLE IF EXISTS professors CASCADE;`;
@@ -103,6 +104,16 @@ async function runSQL() {
         start_time TIME NOT NULL,
         end_time TIME NOT NULL,
         CONSTRAINT valid_time CHECK (start_time < end_time)
+    );`;
+
+    await sql`CREATE TABLE users (
+        id SERIAL PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'professor', 'student', 'staff')),
+        professor_id INTEGER REFERENCES professors(id) ON DELETE SET NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`;
 
     console.log("Dodawanie danych podstawowych...");
@@ -233,6 +244,17 @@ async function runSQL() {
     }
 
     await sql`INSERT INTO equipment ${sql(equipmentData, 'room_id', 'category_id', 'model_name', 'serial_number', 'purchase_date')}`;
+
+    console.log("Dodawanie użytkowników i administratora...");
+    await sql`
+      INSERT INTO users (username, password_hash, email, role, professor_id) VALUES 
+      ('admin', 'admin_hash_123', 'admin@uczelnia.edu.pl', 'admin', NULL),
+      ('a_sklodowska', 'prof_hash_234', 'a.sklodowska@uczelnia.edu.pl', 'professor', ${profsArray[0].id}),
+      ('m_wojcik', 'prof_hash_345', 'm.wojcik@uczelnia.edu.pl', 'professor', ${profsArray[1].id}),
+      ('j_nowak', 'prof_hash_456', 'j.nowak@uczelnia.edu.pl', 'professor', ${profsArray[2].id}),
+      ('student1', 'sec_hash_567', 'student1@uczelnia.edu.pl', 'student', NULL),
+      ('staff_tech', 'sec_hash_789', 'tech@uczelnia.edu.pl', 'staff', NULL);
+    `;
 
     console.log("✅ Baza danych w pełni zainicjalizowana.");
 
