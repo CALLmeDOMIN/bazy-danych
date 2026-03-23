@@ -15,7 +15,7 @@ export async function login(prevState: any, formData: FormData) {
   // W prawdziwej aplikacji użylibyśmy bcrypt.compare
   // Tutaj robimy proste porównanie (w init.ts są: admin_hash_123, prof_hash_*)
   const [user] = await sql`
-    SELECT id, username, email, role, password_hash 
+    SELECT id, username, email, role, password_hash, first_name, last_name 
     FROM users 
     WHERE username = ${username}
   `;
@@ -28,7 +28,9 @@ export async function login(prevState: any, formData: FormData) {
     id: user.id,
     username: user.username,
     role: user.role,
-    email: user.email
+    email: user.email,
+    first_name: user.first_name,
+    last_name: user.last_name
   });
 
   redirect("/");

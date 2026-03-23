@@ -4,8 +4,8 @@ import Link from "next/link";
 export default async function Home() {
   const [roomsCountResult] = await sql`SELECT COUNT(*) FROM rooms`;
   const [buildingsCount] = await sql`SELECT COUNT(*) FROM buildings`;
-  const [profsCountResult] = await sql`SELECT COUNT(*) FROM professors`;
-  const [schedulesCountResult] = await sql`SELECT COUNT(*) FROM schedules`;
+  const [profsCountResult] = await sql`SELECT COUNT(*) FROM users WHERE role = 'professor'`;
+  const [schedulesCountResult] = await sql`SELECT COUNT(*) FROM room_bookings`;
 
   const recentRooms = await sql`
     SELECT r.room_number, b.name AS building_name, c.name AS campus_name, rt.type_name

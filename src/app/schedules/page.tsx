@@ -4,24 +4,25 @@ import SchedulesTable from "./SchedulesTable";
 export default async function SchedulesPage() {
     const rows = await sql`
     SELECT 
-      s.id,
-      s.day_of_week,
-      s.start_time,
-      s.end_time,
+      rb.id,
+      rb.day_of_week,
+      rb.start_time,
+      rb.end_time,
       b.name AS building_name,
       r.room_number,
-      c.course_name,
-      p.first_name AS prof_first,
-      p.last_name AS prof_last,
-      p.title AS prof_title,
+      rb.title as course_name,
+      u.first_name AS prof_first,
+      u.last_name AS prof_last,
+      u.title AS prof_title,
       d.name AS dept_name
-    FROM schedules s
-    INNER JOIN rooms r ON s.room_id = r.id
+    FROM room_bookings rb
+    INNER JOIN rooms r ON rb.room_id = r.id
     INNER JOIN buildings b ON r.building_id = b.id
-    INNER JOIN courses c ON s.course_id = c.id
-    INNER JOIN professors p ON s.professor_id = p.id
-    INNER JOIN departments d ON p.department_id = d.id
-    ORDER BY s.day_of_week ASC, s.start_time ASC;
+    INNER JOIN users u ON rb.user_id = u.id
+    LEFT JOIN departments d ON u.department_id = d.id
+    JOIN booking_statuses bs ON rb.status_id = bs.id
+    WHERE bs.status_name = 'Zatwierdzona'
+    ORDER BY rb.day_of_week ASC, rb.reserved_date ASC, rb.start_time ASC;
   `;
 
     return (

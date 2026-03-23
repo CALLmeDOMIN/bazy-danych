@@ -3,8 +3,17 @@ import { cookies } from "next/headers";
 const SESSION_SECRET = process.env.SESSION_SECRET || "uczelnia_secret_2024_auth_key";
 
 // Helper to encode/decode for Edge compatibility
-const encode = (str: string) => btoa(str);
-const decode = (str: string) => atob(str);
+const encodeBase64 = (str: string) => {
+  const bytes = new TextEncoder().encode(str);
+  const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join("");
+  return btoa(binString);
+};
+
+const decodeBase64 = (b64: string) => {
+  const binString = atob(b64);
+  const bytes = Uint8Array.from(binString, (m) => m.codePointAt(0)!);
+  return new TextDecoder().decode(bytes);
+};
 
 // Use Web Crypto API for signing (available in both Node and Edge)
 async function sign(payload: string, secret: string) {
@@ -18,7 +27,8 @@ async function sign(payload: string, secret: string) {
     ["sign"]
   );
   const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(payload));
-  return btoa(String.fromCharCode(...new Uint8Array(signature)));
+  const signatureStr = Array.from(new Uint8Array(signature), byte => String.fromCodePoint(byte)).join("");
+  return btoa(signatureStr);
 }
 
 async function verify(payload: string, signature: string, secret: string) {
@@ -36,7 +46,7 @@ async function verify(payload: string, signature: string, secret: string) {
 }
 
 export async function encryptSession(data: any): Promise<string> {
-  const payload = encode(JSON.stringify(data));
+  const payload = encodeBase64(JSON.stringify(data));
   const signature = await sign(payload, SESSION_SECRET);
   return `${payload}.${signature}`;
 }
@@ -49,7 +59,7 @@ export async function decryptSession(session: string): Promise<any | null> {
     const isValid = await verify(payload, signature, SESSION_SECRET);
     if (!isValid) return null;
 
-    return JSON.parse(decode(payload));
+    return JSON.parse(decodeBase64(payload));
   } catch (e) {
     return null;
   }
