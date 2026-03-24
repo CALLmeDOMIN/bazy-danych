@@ -19,8 +19,8 @@ export default function BookRoomForm({ rooms }: { rooms: any[] }) {
     <form ref={formRef} action={formAction} className="space-y-6">
       
       <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Sala do rezerwacji</label>
-        <select name="room_id" required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-all text-sm appearance-none">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Sala do rezerwacji</label>
+        <select name="room_id" required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm appearance-none">
           <option value="">Wybierz salę...</option>
           {rooms.map(room => (
             <option key={room.id} value={room.id}>
@@ -31,23 +31,23 @@ export default function BookRoomForm({ rooms }: { rooms: any[] }) {
       </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Tytuł Zdarzenia</label>
-        <input name="title" type="text" placeholder="Wprowadź cel rezerwacji..." required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all text-sm" />
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Tytuł Zdarzenia</label>
+        <input name="title" type="text" placeholder="Wprowadź cel rezerwacji..." required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-all text-sm" />
       </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Data Rezerwacji</label>
-        <input name="reserved_date" type="date" min={today} required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all text-sm" />
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Data Rezerwacji</label>
+        <input name="reserved_date" type="date" min={today} required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm" />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Rozpoczęcie</label>
-          <input name="start_time" type="time" required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all text-sm" />
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Rozpoczęcie</label>
+          <input name="start_time" type="time" required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm" />
         </div>
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Zakończenie</label>
-          <input name="end_time" type="time" required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all text-sm" />
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Zakończenie</label>
+          <input name="end_time" type="time" required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm" />
         </div>
       </div>
 
@@ -68,12 +68,12 @@ export default function BookRoomForm({ rooms }: { rooms: any[] }) {
       <button 
         type="submit"
         disabled={isPending}
-        className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 font-black rounded-xl transition-all active:scale-95 text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/20 mt-4"
+        className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-black rounded-xl transition-all active:scale-95 text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/20 mt-4"
       >
         {isPending ? "PRZETWARZANIE..." : "ZAREZERWUJ SALĘ"}
       </button>
 
-      <p className="text-[9px] text-slate-500 uppercase tracking-widest font-black text-center mt-4">
+      <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black text-center mt-4">
         System automatycznie upewni się o braku kolizji terminów.
       </p>
     </form>

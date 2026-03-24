@@ -28,23 +28,23 @@ export default function BookingModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="glass-card w-full max-w-lg p-8 rounded-3xl border border-white/10 shadow-2xl relative animate-in zoom-in-95 duration-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in duration-300">
+      <div className="glass-card w-full max-w-lg p-8 rounded-3xl border border-border shadow-2xl relative animate-in zoom-in-95 duration-300">
         <button 
           onClick={onClose}
-          className="absolute top-6 right-6 text-slate-500 hover:text-white transition-colors"
+          className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
 
-        <h3 className="text-2xl font-serif font-black text-white mb-8">
+        <h3 className="text-2xl font-serif font-black text-foreground mb-8">
           Nowa <span className="text-primary italic">Rezerwacja</span>
         </h3>
 
         <form action={formAction} className="space-y-5">
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Wybierz Salę</label>
-            <select name="room_id" required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-all text-sm appearance-none">
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Wybierz Salę</label>
+            <select name="room_id" required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm appearance-none">
               <option value="">Wybierz...</option>
               {rooms.map(room => (
                 <option key={room.id} value={room.id}>
@@ -55,23 +55,23 @@ export default function BookingModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Tytuł Zdarzenia</label>
-            <input name="title" type="text" placeholder="Np. Wykład z Baz Danych" required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-700 focus:outline-none focus:border-primary/50 transition-all text-sm" />
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Tytuł Zdarzenia</label>
+            <input name="title" type="text" placeholder="Np. Wykład z Baz Danych" required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-all text-sm" />
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Data</label>
-            <input name="reserved_date" type="date" defaultValue={initialData?.date} required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-all text-sm" />
+            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Data</label>
+            <input name="reserved_date" type="date" defaultValue={initialData?.date} required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm" />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Od</label>
-              <input name="start_time" type="time" defaultValue={initialData?.time} required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-all text-sm" />
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Od</label>
+              <input name="start_time" type="time" defaultValue={initialData?.time} required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm" />
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Do</label>
-              <input name="end_time" type="time" required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-all text-sm" />
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Do</label>
+              <input name="end_time" type="time" required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm" />
             </div>
           </div>
 
@@ -91,7 +91,7 @@ export default function BookingModal({
              <button 
                type="button"
                onClick={onClose}
-               className="flex-1 py-3.5 bg-white/5 hover:bg-white/10 text-white font-bold rounded-xl transition-all border border-white/5 text-xs uppercase tracking-widest"
+               className="flex-1 py-3.5 bg-secondary hover:bg-secondary/80 text-foreground font-bold rounded-xl transition-all border border-border text-xs uppercase tracking-widest"
              >
                Anuluj
              </button>

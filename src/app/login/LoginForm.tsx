@@ -12,23 +12,23 @@ export default function LoginForm() {
       
       <form action={formAction} className="space-y-6">
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Identyfikator</label>
+          <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Identyfikator</label>
           <input 
             name="username"
             type="text" 
             placeholder="Nazwa użytkownika"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"
+            className="w-full bg-secondary border border-border rounded-xl px-5 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-all font-medium"
             required
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Hasło</label>
+          <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Hasło</label>
           <input 
             name="password"
             type="password" 
             placeholder="••••••••"
-            className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-3.5 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all"
+            className="w-full bg-secondary border border-border rounded-xl px-5 py-3.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-all font-medium"
             required
           />
         </div>
@@ -42,7 +42,7 @@ export default function LoginForm() {
         <button 
           type="submit"
           disabled={isPending}
-          className="w-full py-4 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-black rounded-xl transition-all active:scale-95 shadow-xl shadow-primary/20 mt-4"
+          className="w-full py-4 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground font-black rounded-xl transition-all active:scale-95 shadow-xl shadow-primary/20 mt-4"
         >
           {isPending ? "PRZETWARZANIE..." : "UWIERZYTELNIJ"}
         </button>
@@ -50,7 +50,7 @@ export default function LoginForm() {
 
       <div className="mt-8 pt-6 border-t border-white/5 text-center">
          <p className="text-[10px] text-slate-600 uppercase tracking-widest font-bold">
-           System monitorowany przez jednostkę CORE
+           System Zarządzania Zasobami AGH
          </p>
       </div>
     </div>

@@ -73,17 +73,17 @@ export default function CalendarGrid({ bookings, rooms }: { bookings: any[], roo
     <div className="space-y-6">
       
       {/* Header controls */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-6 bg-white/[0.02] border border-white/5 p-4 rounded-2xl backdrop-blur-md">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-6 bg-secondary/30 border border-border p-4 rounded-2xl backdrop-blur-md">
         <div className="flex items-center gap-4">
-          <h3 className="text-xl font-bold text-white min-w-[200px]">
+          <h3 className="text-xl font-bold text-foreground min-w-[200px]">
             {weekDates[0].toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' })}
           </h3>
-          <div className="flex bg-slate-900 rounded-xl p-1 border border-white/5">
-            <button onClick={() => changeWeek(-1)} className="p-2 hover:bg-white/5 rounded-lg text-slate-400 hover:text-white transition-all">
+          <div className="flex bg-secondary rounded-xl p-1 border border-border">
+            <button onClick={() => changeWeek(-1)} className="p-2 hover:bg-background rounded-lg text-muted-foreground hover:text-foreground transition-all">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
             </button>
-            <button onClick={() => setCurrentDate(new Date())} className="px-4 py-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-white transition-all">Dzisiaj</button>
-            <button onClick={() => changeWeek(1)} className="p-2 hover:bg-white/5 rounded-lg text-slate-400 hover:text-white transition-all">
+            <button onClick={() => setCurrentDate(new Date())} className="px-4 py-2 text-xs font-black uppercase tracking-widest text-muted-foreground hover:text-foreground transition-all">Dzisiaj</button>
+            <button onClick={() => changeWeek(1)} className="p-2 hover:bg-background rounded-lg text-muted-foreground hover:text-foreground transition-all">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
             </button>
           </div>
@@ -99,15 +99,15 @@ export default function CalendarGrid({ bookings, rooms }: { bookings: any[], roo
       </div>
 
       {/* Grid */}
-      <div className="glass-card rounded-3xl border border-white/5 overflow-hidden flex flex-col bg-slate-950/20">
+      <div className="glass-card rounded-3xl border border-border overflow-hidden flex flex-col bg-secondary/10">
         
         {/* Days Header */}
-        <div className="grid grid-cols-[80px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-white/5">
-          <div className="p-4 border-r border-white/5"></div>
+        <div className="grid grid-cols-[80px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] border-b border-border">
+          <div className="p-4 border-r border-border"></div>
           {weekDates.map((date, i) => (
-            <div key={i} className={`p-4 text-center border-r border-white/5 last:border-0 ${date.toDateString() === new Date().toDateString() ? 'bg-primary/5' : ''}`}>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">{DAYS[i].substring(0, 3)}</p>
-              <p className={`text-xl font-serif font-black ${date.toDateString() === new Date().toDateString() ? 'text-primary' : 'text-white'}`}>
+            <div key={i} className={`p-4 text-center border-r border-border last:border-0 ${date.toDateString() === new Date().toDateString() ? 'bg-primary/10' : ''}`}>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground mb-1">{DAYS[i].substring(0, 3)}</p>
+              <p className={`text-xl font-serif font-black ${date.toDateString() === new Date().toDateString() ? 'text-primary' : 'text-foreground'}`}>
                 {date.getDate()}
               </p>
             </div>
@@ -119,21 +119,21 @@ export default function CalendarGrid({ bookings, rooms }: { bookings: any[], roo
           <div className="grid grid-cols-[80px_1fr_1fr_1fr_1fr_1fr_1fr_1fr] relative">
             
             {/* Time labels axis */}
-            <div className="border-r border-white/5 bg-slate-950/40">
+            <div className="border-r border-border bg-secondary/30">
               {HOURS.map(hour => (
                 <div key={hour} className="h-[100px] p-2 text-right">
-                  <span className="text-[10px] font-black text-slate-600 tabular-nums">{hour}:00</span>
+                  <span className="text-[10px] font-black text-muted-foreground tabular-nums">{hour}:00</span>
                 </div>
               ))}
             </div>
 
             {/* Grid cells */}
             {weekDates.map((date, dIdx) => (
-              <div key={dIdx} className="relative border-r border-white/5 last:border-0 group">
+              <div key={dIdx} className="relative border-r border-border last:border-0 group">
                 {HOURS.map(hour => (
                   <div 
                     key={hour} 
-                    className="h-[100px] border-b border-white/[0.03] last:border-0 cursor-pointer hover:bg-white/[0.02] transition-colors"
+                    className="h-[100px] border-b border-border/50 last:border-0 cursor-pointer hover:bg-secondary transition-colors"
                     onClick={() => handleSlotClick(date, hour)}
                   ></div>
                 ))}
@@ -152,18 +152,18 @@ export default function CalendarGrid({ bookings, rooms }: { bookings: any[], roo
                         style={{ 
                           top: `${b.top}px`, 
                           height: `${b.height}px`,
-                          backgroundColor: b.booking_type === 'class' ? 'rgba(79, 70, 229, 0.15)' : 'rgba(16, 185, 129, 0.15)',
-                          borderColor: b.booking_type === 'class' ? 'rgba(129, 140, 248, 0.3)' : 'rgba(52, 211, 153, 0.3)',
+                          backgroundColor: b.booking_type === 'class' ? 'rgba(37, 99, 235, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+                          borderColor: b.booking_type === 'class' ? 'rgba(37, 99, 235, 0.2)' : 'rgba(16, 185, 129, 0.2)',
                         }}
                         title={`${b.title} (${b.start_time} - ${b.end_time})`}
                       >
-                         <div className={`absolute left-0 top-0 h-full w-1 rounded-full ${b.booking_type === 'class' ? 'bg-indigo-500' : 'bg-emerald-500'}`}></div>
-                         <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1 truncate">
+                         <div className={`absolute left-0 top-0 h-full w-1 rounded-full ${b.booking_type === 'class' ? 'bg-blue-600' : 'bg-emerald-600'}`}></div>
+                         <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-1 truncate">
                            {b.start_time.substring(0,5)} - {b.end_time.substring(0,5)}
                          </p>
-                         <h5 className="text-[11px] font-bold text-white line-clamp-2 leading-tight group-hover/event:text-primary transition-colors">{b.title}</h5>
+                         <h5 className="text-[11px] font-bold text-foreground line-clamp-1 leading-tight group-hover/event:text-primary transition-colors">{b.title}</h5>
                          {b.room_number && (
-                           <p className="text-[9px] text-slate-500 mt-2 font-black uppercase tracking-tighter">Sala {b.room_number}</p>
+                           <p className="text-[9px] text-muted-foreground mt-2 font-black uppercase tracking-tighter">Sala {b.room_number}</p>
                          )}
                       </div>
                     ))}

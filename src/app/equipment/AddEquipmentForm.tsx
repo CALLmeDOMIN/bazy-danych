@@ -17,8 +17,8 @@ export default function AddEquipmentForm({ rooms, categories }: { rooms: any[], 
     <form ref={formRef} action={formAction} className="space-y-6">
       
       <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Kategoria Sprzętu</label>
-        <select name="category_id" required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-all text-sm appearance-none">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Kategoria Sprzętu</label>
+        <select name="category_id" required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm appearance-none">
           <option value="">Wybierz kategorię...</option>
           {categories.map(c => (
              <option key={c.id} value={c.id}>{c.category_name}</option>
@@ -27,8 +27,8 @@ export default function AddEquipmentForm({ rooms, categories }: { rooms: any[], 
       </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Lokalizacja (Sala)</label>
-        <select name="room_id" required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-all text-sm appearance-none">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Lokalizacja (Sala)</label>
+        <select name="room_id" required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm appearance-none">
           <option value="">Wybierz salę...</option>
           {rooms.map(r => (
              <option key={r.id} value={r.id}>Sala {r.room_number} ({r.building_code})</option>
@@ -37,18 +37,18 @@ export default function AddEquipmentForm({ rooms, categories }: { rooms: any[], 
       </div>
 
       <div className="space-y-2">
-        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Model / Typ / Nazwa</label>
-        <input name="model_name" type="text" placeholder="Przykładowy Model X1" required className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all text-sm" />
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Model / Typ / Nazwa</label>
+        <input name="model_name" type="text" placeholder="Przykładowy Model X1" required className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-all text-sm" />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Nr Seryjny (Opcjonalnie)</label>
-          <input name="serial_number" type="text" placeholder="SN-XXXX" className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all text-sm" />
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Nr Seryjny (Opcjonalnie)</label>
+          <input name="serial_number" type="text" placeholder="SN-XXXX" className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-all text-sm" />
         </div>
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Data Zakupu (Opcjonalnie)</label>
-          <input name="purchase_date" type="date" className="w-full bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:border-primary/50 transition-all text-sm" />
+          <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Data Zakupu (Opcjonalnie)</label>
+          <input name="purchase_date" type="date" className="w-full bg-secondary border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary/50 transition-all text-sm" />
         </div>
       </div>
 
@@ -67,7 +67,7 @@ export default function AddEquipmentForm({ rooms, categories }: { rooms: any[], 
       <button 
         type="submit"
         disabled={isPending}
-        className="w-full py-4 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-black rounded-xl transition-all active:scale-95 text-xs uppercase tracking-widest shadow-lg shadow-amber-500/20 mt-4"
+        className="w-full py-4 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white font-black rounded-xl transition-all active:scale-95 text-xs uppercase tracking-widest shadow-lg shadow-amber-500/20 mt-4"
       >
         {isPending ? "ZAPISYWANIE..." : "DODAJ DO EWIDENCJI"}
       </button>

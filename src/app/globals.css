@@ -1,14 +1,40 @@
 @import "tailwindcss";
 
 :root {
+  --background: #ffffff;
+  --foreground: #020617;
+  --card: #f8fafc;
+  --card-foreground: #020617;
+  --popover: #ffffff;
+  --popover-foreground: #020617;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #020617;
+  --muted: #f1f5f9;
+  --muted-foreground: #475569;
+  --accent: #f1f5f9;
+  --accent-foreground: #020617;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #cbd5e1;
+  --input: #cbd5e1;
+  --ring: #2563eb;
+  --radius: 0.75rem;
+  --sidebar: #f1f5f9;
+  --sidebar-foreground: #0f172a;
+  --sidebar-muted: #64748b;
+}
+
+.dark {
   --background: #020617;
   --foreground: #f8fafc;
   --card: #0f172a;
   --card-foreground: #f8fafc;
   --popover: #020617;
   --popover-foreground: #f8fafc;
-  --primary: #38bdf8;
-  --primary-foreground: #020617;
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
   --secondary: #1e293b;
   --secondary-foreground: #f8fafc;
   --muted: #1e293b;
@@ -16,11 +42,13 @@
   --accent: #1e293b;
   --accent-foreground: #f8fafc;
   --destructive: #ef4444;
-  --destructive-foreground: #f8fafc;
+  --destructive-foreground: #ffffff;
   --border: #1e293b;
   --input: #1e293b;
-  --ring: #38bdf8;
-  --radius: 0.75rem;
+  --ring: #3b82f6;
+  --sidebar: #0f172a;
+  --sidebar-foreground: #f8fafc;
+  --sidebar-muted: #94a3b8;
 }
 
 @theme inline {
@@ -32,6 +60,9 @@
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-border: var(--border);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-serif);
 }
@@ -53,18 +84,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .glass-card {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
 }
 
 .premium-gradient {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  background: var(--card);
 }
 
 .text-gradient {
-  background: linear-gradient(to right, #38bdf8, #818cf8);
+  background: linear-gradient(to right, var(--primary), #004d2e);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

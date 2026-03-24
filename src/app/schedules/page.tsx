@@ -29,8 +29,11 @@ export default async function SchedulesPage() {
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 space-y-10">
             <div className="relative p-10 rounded-3xl premium-gradient border border-white/5 overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-8">
                 <div className="relative z-10">
-                    <h2 className="text-4xl font-serif font-black text-white">Rejestr <span className="text-primary italic">Harmonogramów</span></h2>
-                    <p className="text-slate-400 mt-4 max-w-2xl text-lg font-medium leading-relaxed">
+                    <h1 className="text-4xl font-serif font-black mb-12 flex items-center gap-6">
+        <span className="w-12 h-[2px] bg-primary/40"></span>
+        Harmonogram <span className="text-primary italic">Zajęć</span>
+      </h1>
+              <p className="text-slate-400 mt-4 max-w-2xl text-lg font-medium leading-relaxed">
                         Zabezpieczony wgląd w archiwum obłożeń dydaktycznych. Dane synchronizowane są w czasie rzeczywistym z jednostkami planowania.
                     </p>
                 </div>

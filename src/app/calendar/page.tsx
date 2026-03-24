@@ -30,23 +30,23 @@ export default async function CalendarPage() {
       
       <div className="flex justify-between items-end">
         <div>
-          <h2 className="text-4xl font-serif font-black text-white">
+          <h2 className="text-4xl font-serif font-black text-foreground">
             Planer <span className="text-primary italic">Zajęć</span>
           </h2>
-          <p className="text-slate-500 mt-2 text-sm uppercase tracking-widest font-black flex items-center gap-2">
+          <p className="text-muted-foreground mt-2 text-sm uppercase tracking-widest font-black flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(56,189,248,0.5)]"></span>
             Zintegrowany Widok Tygodniowy (Teams Grid)
           </p>
         </div>
         
-        <div className="hidden lg:flex gap-6 items-center bg-white/[0.02] border border-white/5 px-6 py-4 rounded-2xl">
+        <div className="hidden lg:flex gap-6 items-center bg-secondary/30 border border-border px-6 py-4 rounded-2xl">
            <div className="flex items-center gap-2">
-             <div className="w-3 h-3 rounded-full bg-indigo-500/20 border border-indigo-500/50"></div>
-             <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Zajęcia</span>
+             <div className="w-3 h-3 rounded-full bg-blue-600/20 border border-blue-600/50"></div>
+             <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Zajęcia</span>
            </div>
            <div className="flex items-center gap-2">
-             <div className="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500/50"></div>
-             <span className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Rezerwacje</span>
+             <div className="w-3 h-3 rounded-full bg-emerald-600/20 border border-emerald-600/50"></div>
+             <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">Rezerwacje</span>
            </div>
         </div>
       </div>
