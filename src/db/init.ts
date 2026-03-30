@@ -29,7 +29,8 @@ async function runSQL() {
     await sql`DROP TABLE IF EXISTS schedules CASCADE;`; // old table
 
     await sql`DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE;`;
-    await sql`DROP FUNCTION IF EXISTS book_room CASCADE;`;
+    await sql`DROP FUNCTION IF EXISTS book_room_func CASCADE;`;
+    await sql`DROP PROCEDURE IF EXISTS book_room_proc CASCADE;`;
 
     console.log("Tworzenie schematu...");
     
@@ -189,10 +190,10 @@ async function runSQL() {
     `;
     await sql`CREATE TRIGGER update_maintenance_reports_updated_at BEFORE UPDATE ON maintenance_reports FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();`;
 
-    // Add stored procedure
-    console.log("Tworzenie stored procedures...");
+    // Add stored function
+    console.log("Tworzenie stored functions...");
     await sql`
-      CREATE OR REPLACE PROCEDURE book_room_proc(
+      CREATE OR REPLACE FUNCTION book_room_func(
           p_room_id INTEGER,
           p_user_id INTEGER,
           p_course_id INTEGER,
@@ -201,13 +202,14 @@ async function runSQL() {
           p_title VARCHAR,
           p_reserved_date DATE,
           p_start_time TIME,
-          p_end_time TIME,
-          INOUT p_new_booking_id INTEGER DEFAULT NULL
+          p_end_time TIME
       )
+      RETURNS INTEGER
       LANGUAGE plpgsql
       AS $$
       DECLARE
           v_overlap_count INTEGER;
+          v_new_id INTEGER;
       BEGIN
           SELECT COUNT(*) INTO v_overlap_count
           FROM room_bookings
@@ -223,7 +225,9 @@ async function runSQL() {
 
           INSERT INTO room_bookings (room_id, user_id, course_id, status_id, booking_type, title, reserved_date, start_time, end_time)
           VALUES (p_room_id, p_user_id, p_course_id, p_status_id, p_booking_type, p_title, p_reserved_date, p_start_time, p_end_time)
-          RETURNING id INTO p_new_booking_id;
+          RETURNING id INTO v_new_id;
+
+          RETURN v_new_id;
       END;
       $$;
     `;
@@ -290,7 +294,10 @@ async function runSQL() {
         });
       }
     }
-    await sql`INSERT INTO equipment ${sql(equipmentData, 'room_id', 'category_id', 'model_name', 'serial_number', 'purchase_date', 'status')}`;
+    const equipmentArray = await sql`
+      INSERT INTO equipment ${sql(equipmentData, 'room_id', 'category_id', 'model_name', 'serial_number', 'purchase_date', 'status')}
+      RETURNING id, room_id;
+    `;
 
     console.log("Dodawanie użytkowników i administratora...");
     const usersArray = await sql`
@@ -318,7 +325,60 @@ async function runSQL() {
       RETURNING id;
     `;
 
-    console.log("✅ Baza danych w pełni zainicjalizowana z nowym schematem zgodnym z erDiagram!");
+
+    console.log("Dodawanie zgłoszeń technicznych (Maintenance Reports)...");
+    const reportsData = [
+      {
+        reported_by: usersArray[3].id, // student1
+        room_id: roomsArray[0].id,
+        equipment_id: null,
+        report_type: 'room_preparation',
+        description: 'Potrzebne dodatkowe krzesła na wykład gościnny w auli.',
+        priority: 'normal',
+        status: 'open',
+        resolved_by: null,
+        resolved_at: null
+      },
+      {
+        reported_by: usersArray[4].id, // staff_tech
+        room_id: roomsArray[1].id,
+        equipment_id: (equipmentArray && equipmentArray[0]) ? equipmentArray[0].id : null,
+        report_type: 'broken_equipment',
+        description: 'Projektor mruga i wyłącza się po kilku minutach pracy. Wymagana interwencja.',
+        priority: 'high',
+        status: 'in_progress',
+        resolved_by: null,
+        resolved_at: null
+      },
+      {
+        reported_by: usersArray[1].id, // a_sklodowska
+        room_id: roomsArray[2].id,
+        equipment_id: null,
+        report_type: 'other',
+        description: 'Klimatyzacja w sali wydaje niepokojące dźwięki.',
+        priority: 'low',
+        status: 'open',
+        resolved_by: null,
+        resolved_at: null
+      },
+      {
+        reported_by: usersArray[4].id, // staff_tech
+        room_id: roomsArray[0].id,
+        equipment_id: null,
+        report_type: 'broken_equipment',
+        description: 'Zepsuta klamka w drzwiach wejściowych - naprawione.',
+        priority: 'normal',
+        status: 'resolved',
+        resolved_by: usersArray[0].id, // admin
+        resolved_at: new Date()
+      }
+    ];
+
+    await sql`
+      INSERT INTO maintenance_reports ${sql(reportsData, 'reported_by', 'room_id', 'equipment_id', 'report_type', 'description', 'priority', 'status', 'resolved_by', 'resolved_at')}
+    `;
+
+    console.log("✅ Baza danych w pełni zainicjalizowana z nowym schematem i przykładowymi danymi!");
 
   } catch (error: any) {
     console.error("❌ Błąd:", error.message);

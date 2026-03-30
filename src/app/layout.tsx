@@ -23,7 +23,7 @@ export default async function RootLayout({
   const session = await getSession();
 
   return (
-    <html lang="pl">
+    <html lang="pl" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: `
           (function() {
