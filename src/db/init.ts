@@ -232,6 +232,32 @@ async function runSQL() {
       $$;
     `;
 
+    // Stored procedure that wraps book_room_func (called via CALL)
+    await sql`
+      CREATE OR REPLACE PROCEDURE book_room_proc(
+          p_room_id INTEGER,
+          p_user_id INTEGER,
+          p_course_id INTEGER,
+          p_status_id INTEGER,
+          p_booking_type VARCHAR,
+          p_title VARCHAR,
+          p_reserved_date DATE,
+          p_start_time TIME,
+          p_end_time TIME,
+          INOUT p_new_id INTEGER DEFAULT NULL
+      )
+      LANGUAGE plpgsql
+      AS $$
+      BEGIN
+          p_new_id := book_room_func(
+              p_room_id, p_user_id, p_course_id, p_status_id,
+              p_booking_type, p_title, p_reserved_date,
+              p_start_time, p_end_time
+          );
+      END;
+      $$;
+    `;
+
     console.log("Dodawanie danych podstawowych...");
 
     const campusesArray = await sql`

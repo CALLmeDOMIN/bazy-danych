@@ -28,9 +28,9 @@ export async function addBooking(prevState: any, formData: FormData) {
     const [statusRow] = await sql`SELECT id FROM booking_statuses WHERE status_name = 'Zatwierdzona' LIMIT 1`;
     if (!statusRow) return { error: "Brak statusu 'Zatwierdzona' w bazie danych." };
 
-    // Wywołujemy funkcję book_room_func przez SELECT
+    // Wywołujemy procedurę book_room_proc przez CALL
     const [result] = await sql`
-      SELECT book_room_func(
+      CALL book_room_proc(
         ${room_id}::INTEGER,
         ${session.id}::INTEGER,
         NULL::INTEGER,
@@ -39,11 +39,12 @@ export async function addBooking(prevState: any, formData: FormData) {
         ${title}::VARCHAR,
         ${reserved_date}::DATE,
         ${start_time}::TIME,
-        ${end_time}::TIME
-      ) AS id;
+        ${end_time}::TIME,
+        NULL::INTEGER
+      );
     `;
 
-    console.log("Rezerwacja utworzona. ID:", result.id);
+    console.log("Rezerwacja utworzona. ID:", result.p_new_id);
 
     revalidatePath("/calendar");
     revalidatePath("/my-reservations");

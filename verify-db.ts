@@ -23,19 +23,24 @@ async function verify() {
     // Book Room Procedure test
     try {
       console.log("Testowanie procedury book_room_proc...");
-      await sql`
+      const [room] = await sql`SELECT id FROM rooms LIMIT 1`;
+      const [user] = await sql`SELECT id FROM users LIMIT 1`;
+      const [status] = await sql`SELECT id FROM booking_statuses LIMIT 1`;
+      const [bookResult] = await sql`
         CALL book_room_proc(
-          (SELECT id FROM rooms LIMIT 1),
-          (SELECT id FROM users LIMIT 1),
-          NULL,
-          (SELECT id FROM booking_statuses LIMIT 1),
-          'reservation',
-          'Test Meeting',
-          '2026-05-10',
-          '10:00:00',
-          '11:00:00'
+          ${room.id}::INTEGER,
+          ${user.id}::INTEGER,
+          NULL::INTEGER,
+          ${status.id}::INTEGER,
+          'reservation'::VARCHAR,
+          'Test Meeting'::VARCHAR,
+          '2026-05-10'::DATE,
+          '10:00:00'::TIME,
+          '11:00:00'::TIME,
+          NULL::INTEGER
         );
       `;
+      console.log("Nowa rezerwacja ID:", bookResult.p_new_id);
       console.log("✅ Procedura dodawania rezerwacji działa.");
       
       const countB = await sql`SELECT count(*) FROM room_bookings;`;
