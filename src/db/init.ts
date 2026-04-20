@@ -258,6 +258,83 @@ async function runSQL() {
       $$;
     `;
 
+    console.log("Dodawanie zaawansowanych funkcji (Triggery i Widoki)...");
+
+    // Tabela audytów (kto i komu zmienił rolę lub utworzył usera)
+    await sql`DROP TABLE IF EXISTS user_audit_logs CASCADE;`;
+    await sql`
+      CREATE TABLE user_audit_logs (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER NOT NULL,
+          old_role VARCHAR(20),
+          new_role VARCHAR(20),
+          action_type VARCHAR(20) NOT NULL,
+          changed_at TIMESTAMP DEFAULT NOW()
+      );
+    `;
+
+    // Zaawansowany TRIGGER: Walidacja reguł biznesowych podczas wprowadzania/edycji użytkownika
+    await sql`
+      CREATE OR REPLACE FUNCTION trg_validate_user_business_rules()
+      RETURNS TRIGGER AS $$
+      BEGIN
+          -- 1. Admin nie może mieć przypisanej katedry
+          IF NEW.role = 'admin' AND NEW.department_id IS NOT NULL THEN
+              RAISE EXCEPTION 'Użytkownik o roli admin nie może być przypisany do katedry.';
+          END IF;
+          
+          -- 2. Profesor musi mieć przypisaną katedrę
+          IF NEW.role = 'professor' AND NEW.department_id IS NULL THEN
+              RAISE EXCEPTION 'Użytkownik o roli professor MUSI mieć przypisaną katedrę.';
+          END IF;
+
+          -- Zapis do logów audytowych o zmianie
+          IF TG_OP = 'INSERT' THEN
+             INSERT INTO user_audit_logs (user_id, old_role, new_role, action_type) 
+             VALUES (NEW.id, NULL, NEW.role, 'CREATE');
+          ELSIF TG_OP = 'UPDATE' AND OLD.role IS DISTINCT FROM NEW.role THEN
+             INSERT INTO user_audit_logs (user_id, old_role, new_role, action_type) 
+             VALUES (NEW.id, OLD.role, NEW.role, 'ROLE_CHANGE');
+          END IF;
+
+          RETURN NEW;
+      END;
+      $$ language 'plpgsql';
+    `;
+
+    await sql`
+      CREATE TRIGGER trg_user_business_rules
+      AFTER INSERT OR UPDATE ON users
+      FOR EACH ROW EXECUTE PROCEDURE trg_validate_user_business_rules();
+    `;
+
+    // Zaawansowany WIDOK (View): Zbiorcze statystyki wykorzystania sal (JOIN, GROUP BY, subqueries)
+    await sql`DROP VIEW IF EXISTS vw_room_utilization CASCADE;`;
+    await sql`
+      CREATE VIEW vw_room_utilization AS
+      SELECT 
+          r.id AS room_id,
+          r.room_number,
+          b.name AS building_name,
+          rt.type_name,
+          r.capacity,
+          r.status,
+          COALESCE(COUNT(DISTINCT rb.id), 0) AS total_bookings,
+          COALESCE(COUNT(DISTINCT mr.id), 0) AS total_maintenance_reports,
+          (
+              SELECT COUNT(*) 
+              FROM equipment e 
+              WHERE e.room_id = r.id AND e.status = 'broken'
+          ) AS broken_equipment_count
+      FROM rooms r
+      LEFT JOIN buildings b ON r.building_id = b.id
+      LEFT JOIN room_types rt ON r.room_type_id = rt.id
+      LEFT JOIN room_bookings rb ON rb.room_id = r.id
+      LEFT JOIN maintenance_reports mr ON mr.room_id = r.id
+      GROUP BY r.id, r.room_number, b.name, rt.type_name, r.capacity, r.status
+      ORDER BY total_bookings DESC;
+    `;
+
     console.log("Dodawanie danych podstawowych...");
 
     const campusesArray = await sql`

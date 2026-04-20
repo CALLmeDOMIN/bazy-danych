@@ -24,6 +24,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  // Zabezpieczenie panelu administratora
+  if (pathname.startsWith('/admin') && payload.role !== 'admin') {
+    return NextResponse.redirect(new URL('/', req.nextUrl));
+  }
+
   // Zalogowany użytkownik wchodzi na /login -> do strony głównej
   if (pathname === '/login' && payload) {
     return NextResponse.redirect(new URL('/', req.nextUrl));
