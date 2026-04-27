@@ -340,7 +340,8 @@ async function runSQL() {
     const campusesArray = await sql`
       INSERT INTO campuses (name, location_city, established_year) VALUES 
       ('Kampus Główny', 'Warszawa', 1915),
-      ('Kampus Południowy', 'Kraków', 1880)
+      ('Kampus Południowy', 'Kraków', 1880),
+      ('Kampus Północny', 'Gdańsk', 1950)
       RETURNING id;
     `;
 
@@ -348,7 +349,8 @@ async function runSQL() {
       INSERT INTO buildings (campus_id, name, code, floors) VALUES 
       (${campusesArray[0].id}, 'Wydział Inżynierii Środowiska', 'IŚ', 5),
       (${campusesArray[0].id}, 'Gmach Główny', 'GG', 4),
-      (${campusesArray[1].id}, 'Wydział Elektroniki', 'WE', 6)
+      (${campusesArray[1].id}, 'Wydział Elektroniki', 'WE', 6),
+      (${campusesArray[2].id}, 'Instytut Informatyki', 'II', 3)
       RETURNING id;
     `;
 
@@ -356,7 +358,8 @@ async function runSQL() {
       INSERT INTO room_types (type_name, description) VALUES 
       ('Audytoryjna', 'Sala wykładowa na 100+ miejsc'),
       ('Laboratorium Komputerowe', 'Sala ze stacjami PC'),
-      ('Sala Ćwiczeniowa', 'Klasyczna mniejsza sala')
+      ('Sala Ćwiczeniowa', 'Klasyczna mniejsza sala'),
+      ('Sala Konferencyjna', 'Pokój spotkań i telekonferencji')
       RETURNING id;
     `;
 
@@ -366,6 +369,9 @@ async function runSQL() {
       roomsData.push({ building_id: b.id, room_type_id: roomTypesArray[1].id, room_number: "LAB-" + b.id + "0", capacity: 30, is_accessible: true, status: 'available' });
       roomsData.push({ building_id: b.id, room_type_id: roomTypesArray[2].id, room_number: "S-" + b.id + "5", capacity: 20, is_accessible: false, status: 'available' });
     }
+    roomsData.push({ building_id: buildingsArray[0].id, room_type_id: roomTypesArray[2].id, room_number: "S-100-MAINT", capacity: 25, is_accessible: true, status: 'under_maintenance' });
+    roomsData.push({ building_id: buildingsArray[1].id, room_type_id: roomTypesArray[3].id, room_number: "CONF-99", capacity: 10, is_accessible: true, status: 'closed' });
+
     const roomsArray = await sql`
       INSERT INTO rooms ${sql(roomsData, 'building_id', 'room_type_id', 'room_number', 'capacity', 'is_accessible', 'status')}
       RETURNING id;
@@ -374,29 +380,53 @@ async function runSQL() {
     const departmentsArray = await sql`
       INSERT INTO departments (name, head_of_department) VALUES 
       ('Katedra Baz Danych', 'Prof. Dr hab. Anna Skłodowska'),
-      ('Katedra Algorytmiki', 'Prof. Mikołaj Wójcik')
+      ('Katedra Algorytmiki', 'Prof. Mikołaj Wójcik'),
+      ('Katedra Sztucznej Inteligencji', 'Prof. Zofia Kaczmarek')
       RETURNING id;
     `;
 
     const eqCats = await sql`
       INSERT INTO equipment_categories (category_name) VALUES 
-      ('Stacje Robocze PC'), ('Projektor'), ('Ekran'), ('Głośniki')
+      ('Stacje Robocze PC'), ('Projektor'), ('Ekran'), ('Głośniki'), ('Tablica Interaktywna')
       RETURNING id;
     `;
 
     let equipmentData = [];
+    let eqStatus = ['operational', 'broken', 'under_repair', 'retired'];
     for (let r of roomsArray) {
-      if (Math.random() > 0.5) {
+      if (Math.random() > 0.3) {
         equipmentData.push({
           room_id: r.id,
           category_id: eqCats[1].id,
           model_name: 'Epson Pro 100',
-          serial_number: `PRJ-${r.id}-${Math.floor(Math.random()*100)}`,
+          serial_number: `PRJ-${r.id}-${Math.floor(Math.random()*1000)}`,
           purchase_date: '2022-01-10',
+          status: eqStatus[Math.floor(Math.random() * eqStatus.length)]
+        });
+      }
+      if (Math.random() > 0.6) {
+        equipmentData.push({
+          room_id: r.id,
+          category_id: eqCats[4].id,
+          model_name: 'SmartBoard X',
+          serial_number: `SM-${r.id}-${Math.floor(Math.random()*1000)}`,
+          purchase_date: '2023-05-15',
           status: 'operational'
         });
       }
     }
+    // Dodatkowe zabezpieczenie że equipmentData nie jest puste
+    if (equipmentData.length === 0) {
+      equipmentData.push({
+          room_id: roomsArray[0].id,
+          category_id: eqCats[1].id,
+          model_name: 'Epson Pro 100',
+          serial_number: `PRJ-${roomsArray[0].id}-9999`,
+          purchase_date: '2022-01-10',
+          status: 'operational'
+      });
+    }
+
     const equipmentArray = await sql`
       INSERT INTO equipment ${sql(equipmentData, 'room_id', 'category_id', 'model_name', 'serial_number', 'purchase_date', 'status')}
       RETURNING id, room_id;
@@ -404,19 +434,24 @@ async function runSQL() {
 
     console.log("Dodawanie użytkowników i administratora...");
     const usersArray = await sql`
-      INSERT INTO users (username, password_hash, email, role, department_id, first_name, last_name, title) VALUES 
-      ('admin', 'admin_hash_123', 'admin@uczelnia.edu.pl', 'admin', NULL, 'Główny', 'Administrator', NULL),
-      ('a_sklodowska', 'prof_hash_234', 'a.sklodowska@uczelnia.edu.pl', 'professor', ${departmentsArray[0].id}, 'Anna', 'Skłodowska', 'Prof. Dr hab.'),
-      ('m_wojcik', 'prof_hash_345', 'm.wojcik@uczelnia.edu.pl', 'professor', ${departmentsArray[1].id}, 'Mikołaj', 'Wójcik', 'Prof.'),
-      ('student1', 'sec_hash_567', 'student1@uczelnia.edu.pl', 'student', NULL, 'Jan', 'Kowalski', NULL),
-      ('staff_tech', 'sec_hash_789', 'tech@uczelnia.edu.pl', 'staff', NULL, 'Piotr', 'Techniczny', NULL)
+      INSERT INTO users (username, password_hash, email, role, department_id, first_name, last_name, title, is_active) VALUES 
+      ('admin', 'admin_hash_123', 'admin@uczelnia.edu.pl', 'admin', NULL, 'Główny', 'Administrator', NULL, true),
+      ('a_sklodowska', 'prof_hash_234', 'a.sklodowska@uczelnia.edu.pl', 'professor', ${departmentsArray[0].id}, 'Anna', 'Skłodowska', 'Prof. Dr hab.', true),
+      ('m_wojcik', 'prof_hash_345', 'm.wojcik@uczelnia.edu.pl', 'professor', ${departmentsArray[1].id}, 'Mikołaj', 'Wójcik', 'Prof.', true),
+      ('z_kaczmarek', 'prof_hash_abc', 'z.kaczmarek@uczelnia.edu.pl', 'professor', ${departmentsArray[2].id}, 'Zofia', 'Kaczmarek', 'Prof. Dr', true),
+      ('student1', 'sec_hash_567', 'student1@uczelnia.edu.pl', 'student', NULL, 'Jan', 'Kowalski', NULL, true),
+      ('student2', 'sec_hash_stu2', 'student2@uczelnia.edu.pl', 'student', NULL, 'Katarzyna', 'Nowak', NULL, true),
+      ('student3_inactive', 'sec_hash_stu3', 'student3@uczelnia.edu.pl', 'student', NULL, 'Michał', 'Zalewski', NULL, false),
+      ('staff_tech', 'sec_hash_789', 'tech@uczelnia.edu.pl', 'staff', NULL, 'Piotr', 'Techniczny', NULL, true)
       RETURNING id;
     `;
 
     const coursesArray = await sql`
       INSERT INTO courses (department_id, course_name, course_code, credits) VALUES 
       (${departmentsArray[0].id}, 'Zaawansowane Bazy Danych SQL', 'CS-DB-401', 6),
-      (${departmentsArray[1].id}, 'Algorytmy i Struktury Danych', 'CS-AL-201', 6)
+      (${departmentsArray[1].id}, 'Algorytmy i Struktury Danych', 'CS-AL-201', 6),
+      (${departmentsArray[2].id}, 'Wstęp do Uczenia Maszynowego', 'CS-AI-301', 5),
+      (${departmentsArray[2].id}, 'Sieci Neuronowe', 'CS-AI-401', 6)
       RETURNING id;
     `;
 
@@ -428,11 +463,74 @@ async function runSQL() {
       RETURNING id;
     `;
 
+    console.log("Dodawanie rezerwacji (Room Bookings)...");
+    const bookingsData = [
+      {
+        room_id: roomsArray[0].id,
+        user_id: usersArray[1].id,
+        course_id: coursesArray[0].id,
+        status_id: statusesArray[0].id,
+        booking_type: 'class',
+        title: 'Wykład - Zaawansowane Bazy Danych SQL',
+        semester: 'Zima 2026',
+        day_of_week: 1,
+        reserved_date: null,
+        start_time: '08:00:00',
+        end_time: '09:30:00',
+        notes: 'Semestr zimowy, wyklad cykliczny'
+      },
+      {
+        room_id: roomsArray[1].id,
+        user_id: usersArray[2].id,
+        course_id: coursesArray[1].id,
+        status_id: statusesArray[0].id,
+        booking_type: 'class',
+        title: 'Laboratorium Algorytmiki',
+        semester: 'Zima 2026',
+        day_of_week: 3,
+        reserved_date: null,
+        start_time: '10:00:00',
+        end_time: '11:30:00',
+        notes: ''
+      },
+      {
+        room_id: roomsArray[2].id,
+        user_id: usersArray[4].id,
+        course_id: null,
+        status_id: statusesArray[1].id,
+        booking_type: 'reservation',
+        title: 'Spotkanie Koła Naukowego',
+        semester: null,
+        day_of_week: null,
+        reserved_date: '2026-05-15',
+        start_time: '16:00:00',
+        end_time: '18:00:00',
+        notes: 'Prośba o rzutnik'
+      },
+      {
+        room_id: roomsArray[3].id,
+        user_id: usersArray[3].id,
+        course_id: coursesArray[2].id,
+        status_id: statusesArray[2].id,
+        booking_type: 'reservation',
+        title: 'Dodatkowe konsultacje przed egzaminem',
+        semester: 'Lat 2026',
+        day_of_week: null,
+        reserved_date: '2026-06-10',
+        start_time: '14:00:00',
+        end_time: '15:30:00',
+        notes: 'Odwołane z powodu choroby'
+      }
+    ];
+
+    await sql`
+      INSERT INTO room_bookings ${sql(bookingsData, 'room_id', 'user_id', 'course_id', 'status_id', 'booking_type', 'title', 'semester', 'day_of_week', 'reserved_date', 'start_time', 'end_time', 'notes')}
+    `;
 
     console.log("Dodawanie zgłoszeń technicznych (Maintenance Reports)...");
     const reportsData = [
       {
-        reported_by: usersArray[3].id, // student1
+        reported_by: usersArray[4].id,
         room_id: roomsArray[0].id,
         equipment_id: null,
         report_type: 'room_preparation',
@@ -443,9 +541,9 @@ async function runSQL() {
         resolved_at: null
       },
       {
-        reported_by: usersArray[4].id, // staff_tech
+        reported_by: usersArray[7].id,
         room_id: roomsArray[1].id,
-        equipment_id: (equipmentArray && equipmentArray[0]) ? equipmentArray[0].id : null,
+        equipment_id: (equipmentArray && equipmentArray.length > 0) ? equipmentArray[0].id : null,
         report_type: 'broken_equipment',
         description: 'Projektor mruga i wyłącza się po kilku minutach pracy. Wymagana interwencja.',
         priority: 'high',
@@ -454,7 +552,7 @@ async function runSQL() {
         resolved_at: null
       },
       {
-        reported_by: usersArray[1].id, // a_sklodowska
+        reported_by: usersArray[1].id,
         room_id: roomsArray[2].id,
         equipment_id: null,
         report_type: 'other',
@@ -465,20 +563,39 @@ async function runSQL() {
         resolved_at: null
       },
       {
-        reported_by: usersArray[4].id, // staff_tech
+        reported_by: usersArray[7].id,
         room_id: roomsArray[0].id,
         equipment_id: null,
         report_type: 'broken_equipment',
         description: 'Zepsuta klamka w drzwiach wejściowych - naprawione.',
         priority: 'normal',
         status: 'resolved',
-        resolved_by: usersArray[0].id, // admin
+        resolved_by: usersArray[0].id,
+        resolved_at: new Date()
+      },
+      {
+        reported_by: usersArray[2].id,
+        room_id: roomsArray[3].id,
+        equipment_id: null,
+        report_type: 'other',
+        description: 'Brak pisaków i gąbki do tablicy przed egzaminem.',
+        priority: 'critical',
+        status: 'rejected',
+        resolved_by: usersArray[0].id,
         resolved_at: new Date()
       }
     ];
 
     await sql`
       INSERT INTO maintenance_reports ${sql(reportsData, 'reported_by', 'room_id', 'equipment_id', 'report_type', 'description', 'priority', 'status', 'resolved_by', 'resolved_at')}
+    `;
+
+    // Wywołanie modyfikacji użytkownika by uruchomić user_audit_logs trigger
+    await sql`
+      UPDATE users SET role = 'professor', department_id = ${departmentsArray[0].id}, title = 'Doktor' WHERE id = ${usersArray[7].id}
+    `;
+    await sql`
+      UPDATE users SET role = 'staff', department_id = NULL, title = NULL WHERE id = ${usersArray[7].id}
     `;
 
     console.log("✅ Baza danych w pełni zainicjalizowana z nowym schematem i przykładowymi danymi!");

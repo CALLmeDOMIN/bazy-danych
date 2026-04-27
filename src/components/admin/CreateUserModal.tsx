@@ -30,8 +30,8 @@ export default function CreateUserModal({ departments }: { departments: any[] })
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-background border border-white/10 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl relative">
+      <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div className="bg-slate-950 border border-white/10 rounded-3xl w-full max-w-lg overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.5)] relative">
           <div className="p-6 border-b border-white/5 bg-secondary/30 flex justify-between items-center">
             <h2 className="text-xl font-serif font-black text-foreground">Kreator Użytkownika</h2>
             <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground text-2xl leading-none">&times;</button>

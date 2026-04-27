@@ -94,3 +94,60 @@ export async function getAuditLogs() {
     LIMIT 10;
   `;
 }
+
+export async function updateUser(prevState: any, formData: FormData) {
+  try {
+    const session = await checkAdmin();
+    const userId = Number(formData.get("id"));
+    const username = formData.get("username") as string;
+    const email = formData.get("email") as string;
+    const role = formData.get("role") as string;
+    const first_name = formData.get("first_name") as string;
+    const last_name = formData.get("last_name") as string;
+    const departmentStr = formData.get("department_id") as string;
+    const department_id = departmentStr ? Number(departmentStr) : null;
+    const is_active = formData.get("is_active") === "on";
+
+    if (!userId || !username || !email || !role || !first_name || !last_name) {
+      return { error: "Wypełnij wszystkie wymagane pola." };
+    }
+
+    await sql`
+      UPDATE users SET 
+        username = ${username},
+        email = ${email},
+        role = ${role},
+        department_id = ${department_id},
+        first_name = ${first_name},
+        last_name = ${last_name},
+        is_active = ${is_active},
+        updated_at = NOW()
+      WHERE id = ${userId}
+    `;
+
+    revalidatePath("/admin/users");
+    return { success: "Dane użytkownika zostały zaktualizowane." };
+  } catch (err: any) {
+    if (err.message.includes("nie może być przypisany") || err.message.includes("MUSI mieć przypisaną")) {
+      return { error: "Błąd Walidacji (Trigger): " + err.message };
+    }
+    return { error: "Wystąpił błąd: " + err.message };
+  }
+}
+
+export async function deleteUser(userId: number) {
+  try {
+    const session = await checkAdmin();
+    
+    if (session.id === userId) {
+      throw new Error("Nie możesz usunąć własnego konta administratora!");
+    }
+
+    await sql`DELETE FROM users WHERE id = ${userId}`;
+    
+    revalidatePath("/admin/users");
+    return { success: true };
+  } catch (err: any) {
+    return { error: err.message };
+  }
+}

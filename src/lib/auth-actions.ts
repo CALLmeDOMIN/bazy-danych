@@ -15,13 +15,17 @@ export async function login(prevState: any, formData: FormData) {
   // W prawdziwej aplikacji użylibyśmy bcrypt.compare
   // Tutaj robimy proste porównanie (w init.ts są: admin_hash_123, prof_hash_*)
   const [user] = await sql`
-    SELECT id, username, email, role, password_hash, first_name, last_name 
+    SELECT id, username, email, role, password_hash, first_name, last_name, is_active
     FROM users 
     WHERE username = ${username}
   `;
 
   if (!user || user.password_hash !== password) {
     return { error: "Nieprawidłowa nazwa użytkownika lub hasło." };
+  }
+
+  if (!user.is_active) {
+    return { error: "Twoje konto zostało zablokowane przez administratora." };
   }
 
   await setSession({

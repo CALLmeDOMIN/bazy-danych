@@ -1,5 +1,7 @@
 import { getAdminUsers, getDepartments } from "@/lib/admin-actions";
 import CreateUserModal from "@/components/admin/CreateUserModal";
+import EditUserModal from "@/components/admin/EditUserModal";
+import DeleteUserModal from "@/components/admin/DeleteUserModal";
 import Link from "next/link";
 
 export default async function AdminUsersPage() {
@@ -30,7 +32,8 @@ export default async function AdminUsersPage() {
                 <th className="px-4 py-3">Kontakt</th>
                 <th className="px-4 py-3">Rola i Przydział</th>
                 <th className="px-4 py-3 text-center">Aktywność</th>
-                <th className="px-4 py-3 rounded-r-lg text-center">Status Konta</th>
+                <th className="px-4 py-3 text-center">Status</th>
+                <th className="px-4 py-3 rounded-r-lg text-center">Akcje</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -62,6 +65,12 @@ export default async function AdminUsersPage() {
                     ) : (
                       <span className="w-2 h-2 rounded-full border-[3px] shadow-[0_0_8px_rgba(239,68,68,0.5)] border-red-500 bg-red-500/20 inline-block"></span>
                     )}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                        <EditUserModal user={u} departments={departments} />
+                        <DeleteUserModal user={u} />
+                    </div>
                   </td>
                 </tr>
               ))}
